@@ -5,6 +5,10 @@ library(forecast)
 library(dplyr)
 library(bigQueryR)
 
+## change these to your settings
+YOUR_PROJECT_ID <- "projectID"
+YOUR_DATASET_ID <- "datasetId"
+BIGQUERY_FIELDS <- c("pageURL","Referrer","ts")
 
 do_bq <- function(limit){
 
@@ -13,8 +17,8 @@ do_bq <- function(limit){
   q <- sprintf("SELECT * FROM [big-query-r:tests.realtime_markedmondsonme] ORDER BY ts DESC LIMIT %s", 
                limit)
   
-  bqr_query(projectId = "big-query-r", 
-            datasetId = "tests", 
+  bqr_query(projectId = YOUR_PROJECT_ID, 
+            datasetId = YOUR_DATASET_ID, 
             query = q, 
             useQueryCache = FALSE)  
 }
@@ -26,7 +30,7 @@ get_bq <- function(){
   check <- do_bq(1000)
   
   rt <- as.data.frame(check, stringsAsFactors = FALSE)
-  names(rt) <- c("pageURL","Referrer","ts")
+  names(rt) <- BIGQUERY_FIELDS
   
   ## turn string into JS timestamp
   rt$timestamp <- as.POSIXct(as.numeric(as.character(rt$ts)), origin="1970-01-01")
